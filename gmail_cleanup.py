@@ -69,7 +69,7 @@ def main():
     parser = argparse.ArgumentParser(description="Gmail cleanup: trash/delete old messages.")
     parser.add_argument("--trash", action="store_true", help="Move to Trash.")
     parser.add_argument("--hard-delete", action="store_true", help="IMMEDIATE and irreversible deletion (skip Trash).")
-    parser.add_argument("--query", type=str, default="older_than:8y in:inbox",
+    parser.add_argument("--query", type=str, default="older_than:10y in:inbox",
                         help="Gmail query to select messages.")
     parser.add_argument("--protect-label", action="append", default=[],
                         help="Labels to protect: if present on the message, it will NOT be deleted. Repeatable.")

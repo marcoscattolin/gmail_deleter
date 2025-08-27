@@ -82,7 +82,7 @@ def main():
     elif args.hard_delete:
         print("Modalità: HARD DELETE (irreversibile)")
     else:
-        print("Modalità: DRY-RUN (nessuna modifica). Specifica --trash o --hard-delete per eseguire le modifiche.")
+        print("Modalità: DRY-RUN (nessuna modifica). Specifica --trash oppure --hard-delete per eseguire le modifiche.")
 
     service = get_service()
 
@@ -107,7 +107,7 @@ def main():
 
     if not args.trash and not args.hard_delete:
         # Nessuna modifica: solo anteprima del numero
-        print("DRY-RUN: non verrà cancellato nulla. Specifica --trash o --hard-delete per eseguire le modifiche.")
+        print("DRY-RUN: non verrà cancellato nulla. Specifica --trash oppure --hard-delete per eseguire le modifiche.")
         return
 
     # chiedi all'utente se vuole procedere

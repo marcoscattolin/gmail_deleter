@@ -11,7 +11,7 @@ from google.auth.transport.requests import Request
 import os
 import sys
 
-# Scopi minimi: lettura/scrittura messaggi
+# Minimum scopes: read/write messages
 SCOPES = ["https://www.googleapis.com/auth/gmail.modify"]
 
 def get_service() -> any:
@@ -29,7 +29,7 @@ def get_service() -> any:
     return build("gmail", "v1", credentials=creds)
 
 def gmail_search(service, query: str, user_id: str = "me"):
-    """Generator che restituisce gli ID dei messaggi che corrispondono alla query."""
+    """Generator that returns message IDs that match the query."""
     page_token = None
     while True:
         resp = service.users().messages().list(
@@ -58,65 +58,65 @@ def trash_message(service, msg_id: str, hard_delete: bool = False, user_id: str 
                 backoff_sleep(attempt)
                 continue
             else:
-                print(f"[SKIP] {msg_id} errore permanente: {e}", file=sys.stderr)
+                print(f"[SKIP] {msg_id} permanent error: {e}", file=sys.stderr)
                 return False
         except Exception as ex:
-            print(f"[SKIP] {msg_id} errore: {ex}", file=sys.stderr)
+            print(f"[SKIP] {msg_id} error: {ex}", file=sys.stderr)
             backoff_sleep(attempt)
     return False
 
 def main():
-    parser = argparse.ArgumentParser(description="Gmail cleanup: cestina/elimina messaggi vecchi.")
-    parser.add_argument("--trash", action="store_true", help="Sposta nel Cestino.")
-    parser.add_argument("--hard-delete", action="store_true", help="Eliminazione IMMEDIATA e irreversibile (salta il Cestino).")
+    parser = argparse.ArgumentParser(description="Gmail cleanup: trash/delete old messages.")
+    parser.add_argument("--trash", action="store_true", help="Move to Trash.")
+    parser.add_argument("--hard-delete", action="store_true", help="IMMEDIATE and irreversible deletion (skip Trash).")
     parser.add_argument("--query", type=str, default="older_than:8y in:inbox",
-                        help="Query di Gmail per selezionare i messaggi.")
+                        help="Gmail query to select messages.")
     parser.add_argument("--protect-label", action="append", default=[],
-                        help="Etichette da proteggere: se presenti sul messaggio, NON viene cancellato. Ripetibile.")
-    parser.add_argument("--limit", type=int, default=0, help="Limite massimo di messaggi da processare (0 = nessun limite).")
+                        help="Labels to protect: if present on the message, it will NOT be deleted. Repeatable.")
+    parser.add_argument("--limit", type=int, default=0, help="Maximum limit of messages to process (0 = no limit).")
     args = parser.parse_args()
 
     print(f"Query: {args.query}")
     if args.trash:
-        print("Modalità: TRASH (sposta nel Cestino)")
+        print("Mode: TRASH (move to Trash)")
     elif args.hard_delete:
-        print("Modalità: HARD DELETE (irreversibile)")
+        print("Mode: HARD DELETE (irreversible)")
     else:
-        print("Modalità: DRY-RUN (nessuna modifica). Specifica --trash oppure --hard-delete per eseguire le modifiche.")
+        print("Mode: DRY-RUN (no changes). Specify --trash or --hard-delete to execute changes.")
 
     service = get_service()
 
-    # Se l'utente ha indicato etichette da proteggere, estendiamo la query per escluderle
-    # (questa è un'esclusione "best-effort" a livello di ricerca; ulteriore controllo è sotto)
+    # If the user has indicated labels to protect, we extend the query to exclude them
+    # (this is a "best-effort" exclusion at search level; further checking is below)
     q = args.query
     for lbl in args.protect_label:
         q += f' -label:"{lbl}"'
 
     processed = 0
     matched_ids: List[str] = []
-    print("Cerco messaggi...")
+    print("Searching for messages...")
 
-    # Raccogliamo gli ID una volta (così il set è stabile anche se nel frattempo il Cestino cambia)
+    # We collect IDs once (so the set is stable even if Trash changes in the meantime)
     for msg_id in gmail_search(service, q):
         matched_ids.append(msg_id)
         if args.limit and len(matched_ids) >= args.limit:
             break
 
     total = len(matched_ids)
-    print(f"Trovati {total} messaggi che corrispondono.")
+    print(f"Found {total} matching messages.")
 
     if not args.trash and not args.hard_delete:
-        # Nessuna modifica: solo anteprima del numero
-        print("DRY-RUN: non verrà cancellato nulla. Specifica --trash oppure --hard-delete per eseguire le modifiche.")
+        # No changes: only preview of the number
+        print("DRY-RUN: nothing will be deleted. Specify --trash or --hard-delete to execute changes.")
         return
 
-    # chiedi all'utente se vuole procedere
-    proceed = input("Vuoi procedere? (y/n): ")
+    # ask the user if they want to proceed
+    proceed = input("Do you want to proceed? (y/n): ")
     if proceed != "y":
-        print("Operazione annullata.")
+        print("Operation cancelled.")
         return
 
-    # Per sicurezza: controllo etichette protette messaggio-per-messaggio (se richieste)
+    # For safety: check protected labels message-by-message (if requested)
     protect = set(args.protect_label)
 
     done = 0
@@ -124,17 +124,17 @@ def main():
     t0 = time.time()
     for i, msg_id in enumerate(matched_ids, start=1):
         if protect:
-            # Recupero metadati rapidi (solo labelIds) per filtrare
+            # Retrieve quick metadata (only labelIds) to filter
             try:
                 m = service.users().messages().get(
                     userId="me", id=msg_id, format="metadata", metadataHeaders=[]
                 ).execute()
                 label_ids = set(m.get("labelIds", []))
-                # i nomi custom delle etichette non coincidono con labelIds; va mappato.
-                # Per semplicità, filtriamo già in query e qui saltiamo questo passaggio.
-                # (Se servisse mappare con precisione, bisognerebbe scaricare tutte le labels e confrontare gli ID.)
+                # custom label names don't match labelIds; they need to be mapped.
+                # For simplicity, we filter already in the query and skip this step here.
+                # (If precise mapping were needed, we would need to download all labels and compare IDs.)
             except HttpError:
-                # Se fallisce il get, proviamo comunque a proseguire
+                # If get fails, we try to continue anyway
                 label_ids = set()
 
         ok = trash_message(service, msg_id, hard_delete=args.hard_delete)
@@ -143,17 +143,17 @@ def main():
         else:
             skipped += 1
 
-        # Piccola pausa gentile ogni 200 azioni
+        # Small gentle pause every 200 actions
         if i % 200 == 0:
             time.sleep(1)
 
-        # Stampa progress ogni 500
+        # Print progress every 500
         if i % 500 == 0:
             rate = done / max(1, (time.time() - t0))
-            print(f"Progress: {i}/{total} (cestinati/eliminati: {done}, saltati: {skipped}) ~{rate:.1f} msg/s")
+            print(f"Progress: {i}/{total} (trashed/deleted: {done}, skipped: {skipped}) ~{rate:.1f} msg/s")
 
-    print(f"FATTO. Totale elaborati: {total}. "
-          f"{'Eliminati' if args.hard_delete else 'Cestinati'}: {done}. Saltati: {skipped}.")
+    print(f"DONE. Total processed: {total}. "
+          f"{'Deleted' if args.hard_delete else 'Trashed'}: {done}. Skipped: {skipped}.")
 
 if __name__ == "__main__":
     main()

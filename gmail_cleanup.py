@@ -123,7 +123,7 @@ def main():
     skipped = 0
     t0 = time.time()
     now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    print(f"[{now}]: Starting deletion...")
+    print(f"[{now}]: Starting operation...")
 
     for i, msg_id in enumerate(matched_ids, start=1):
         if protect:

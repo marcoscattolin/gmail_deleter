@@ -110,6 +110,12 @@ def main():
         print("DRY-RUN: non verrà cancellato nulla. Specifica --trash o --hard-delete per eseguire le modifiche.")
         return
 
+    # chiedi all'utente se vuole procedere
+    proceed = input("Vuoi procedere? (y/n): ")
+    if proceed != "y":
+        print("Operazione annullata.")
+        return
+
     # Per sicurezza: controllo etichette protette messaggio-per-messaggio (se richieste)
     protect = set(args.protect_label)
 

@@ -68,13 +68,13 @@ La query usa la stessa sintassi della barra di ricerca di Gmail.
 Esempi:
 
 ```bash
-# Solo email in Posta in arrivo più vecchie di 2 anni
-uv run gmail_cleanup.py --query "older_than:2y in:inbox -in:spam -in:trash"
+# Solo email più vecchie di 2 anni nella cartella inbox
+uv run gmail_cleanup.py --query "older_than:2y in:inbox"
 
-# Email più vecchie del 1° gennaio 2023
+# Email più vecchie del 1° gennaio 2023 escluse email in spam e trash
 uv run gmail_cleanup.py --query "before:2023/01/01 -in:spam -in:trash"
 
-# Escludere le email di un mittente
+# Escludere le email di un mittente escluse le email in spam e trash
 uv run gmail_cleanup.py --query "older_than:2y -from:capo@azienda.com -in:spam -in:trash"
 ```
 

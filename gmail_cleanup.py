@@ -69,7 +69,7 @@ def main():
     parser = argparse.ArgumentParser(description="Gmail cleanup: cestina/elimina messaggi vecchi.")
     parser.add_argument("--dry-run", action="store_true", help="Non modifica nulla; mostra solo il conto.")
     parser.add_argument("--hard-delete", action="store_true", help="Eliminazione IMMEDIATA e irreversibile (salta il Cestino).")
-    parser.add_argument("--query", type=str, default="older_than:8y -in:spam -in:trash",
+    parser.add_argument("--query", type=str, default="older_than:8y in:inbox",
                         help="Query di Gmail per selezionare i messaggi.")
     parser.add_argument("--protect-label", action="append", default=[],
                         help="Etichette da proteggere: se presenti sul messaggio, NON viene cancellato. Ripetibile.")

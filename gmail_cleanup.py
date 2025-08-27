@@ -122,6 +122,9 @@ def main():
     done = 0
     skipped = 0
     t0 = time.time()
+    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print(f"[{now}]: Starting deletion...")
+
     for i, msg_id in enumerate(matched_ids, start=1):
         if protect:
             # Retrieve quick metadata (only labelIds) to filter
@@ -149,10 +152,12 @@ def main():
 
         # Print progress every 500
         if i % 500 == 0:
+            now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             rate = done / max(1, (time.time() - t0))
-            print(f"Progress: {i}/{total} (trashed/deleted: {done}, skipped: {skipped}) ~{rate:.1f} msg/s")
+            print(f"[{now}]: Progress: {i}/{total} (trashed/deleted: {done}, skipped: {skipped}) ~{rate:.1f} msg/s")
 
-    print(f"DONE. Total processed: {total}. "
+    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print(f"[{now}]: DONE. Total processed: {total}. "
           f"{'Deleted' if args.hard_delete else 'Trashed'}: {done}. Skipped: {skipped}.")
 
 if __name__ == "__main__":

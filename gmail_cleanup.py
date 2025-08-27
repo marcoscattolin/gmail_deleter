@@ -67,7 +67,7 @@ def trash_message(service, msg_id: str, hard_delete: bool = False, user_id: str 
 
 def main():
     parser = argparse.ArgumentParser(description="Gmail cleanup: cestina/elimina messaggi vecchi.")
-    parser.add_argument("--dry-run", action="store_true", help="Non modifica nulla; mostra solo il conto.")
+    parser.add_argument("--trash", action="store_true", help="Sposta nel Cestino.")
     parser.add_argument("--hard-delete", action="store_true", help="Eliminazione IMMEDIATA e irreversibile (salta il Cestino).")
     parser.add_argument("--query", type=str, default="older_than:8y in:inbox",
                         help="Query di Gmail per selezionare i messaggi.")
@@ -76,17 +76,13 @@ def main():
     parser.add_argument("--limit", type=int, default=0, help="Limite massimo di messaggi da processare (0 = nessun limite).")
     args = parser.parse_args()
 
-    if args.hard_delete and args.dry_run:
-        print("⚠️ --hard-delete e --dry-run insieme non hanno senso: rimuovi uno dei due.")
-        sys.exit(1)
-
     print(f"Query: {args.query}")
-    if args.dry_run:
-        print("Modalità: DRY-RUN (nessuna modifica)")
+    if args.trash:
+        print("Modalità: TRASH (sposta nel Cestino)")
     elif args.hard_delete:
         print("Modalità: HARD DELETE (irreversibile)")
     else:
-        print("Modalità: TRASH (sposta nel Cestino)")
+        print("Modalità: DRY-RUN (nessuna modifica). Specifica --trash o --hard-delete per eseguire le modifiche.")
 
     service = get_service()
 
@@ -109,9 +105,9 @@ def main():
     total = len(matched_ids)
     print(f"Trovati {total} messaggi che corrispondono.")
 
-    if args.dry_run:
+    if not args.trash and not args.hard_delete:
         # Nessuna modifica: solo anteprima del numero
-        print("DRY-RUN: non verrà cancellato nulla.")
+        print("DRY-RUN: non verrà cancellato nulla. Specifica --trash o --hard-delete per eseguire le modifiche.")
         return
 
     # Per sicurezza: controllo etichette protette messaggio-per-messaggio (se richieste)

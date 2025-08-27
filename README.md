@@ -34,21 +34,21 @@ A `token.json` file will be created containing the access token and will be reus
 
 ## ⚙️ Usage
 
-### Basic command (simulation, no changes, count emails older than 10).
+### Basic command (simulation, no changes, count emails older than 10 years).
 
 ```bash
 uv run gmail_cleanup.py
 ```
 
-Shows only how many emails match the query without moving them to Trash.
+Shows only how many emails match the query without deleting or moving them to Trash.
 
-### TRASH mode (move emails to trash folder)
+### TRASH mode: actually move emails to trash folder.
 
 ```bash
 uv run gmail_cleanup.py --trash
 ```
 
-### HARD DELETE mode: immediate and irreversible deletion
+### HARD DELETE mode: immediate and irreversible deletion.
 
 ```bash
 uv run gmail_cleanup.py --hard-delete

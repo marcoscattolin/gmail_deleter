@@ -37,13 +37,13 @@ Verrà creato un file `token.json` che contiene il token di accesso e verrà riu
 ### Comando base (sposta nel Cestino le email più vecchie di 2 anni)
 
 ```bash
-python gmail_cleanup.py
+uv run gmail_cleanup.py
 ```
 
 ### Modalità DRY-RUN (simulazione, nessuna modifica)
 
 ```bash
-python gmail_cleanup.py --dry-run
+uv run gmail_cleanup.py --dry-run
 ```
 
 Mostra solo quante email corrispondono alla query senza spostarle nel Cestino.
@@ -51,7 +51,7 @@ Mostra solo quante email corrispondono alla query senza spostarle nel Cestino.
 ### Eliminazione immediata e irreversibile
 
 ```bash
-python gmail_cleanup.py --hard-delete
+uv run gmail_cleanup.py --hard-delete
 ```
 
 ⚠️ Attenzione: i messaggi non passano dal Cestino, vengono eliminati subito.
@@ -59,7 +59,7 @@ python gmail_cleanup.py --hard-delete
 ### Limitare il numero di messaggi processati
 
 ```bash
-python gmail_cleanup.py --limit 200
+uv run gmail_cleanup.py --limit 200
 ```
 
 ### Modificare la query Gmail
@@ -69,19 +69,19 @@ Esempi:
 
 ```bash
 # Solo email in Posta in arrivo più vecchie di 2 anni
-python gmail_cleanup.py --query "older_than:2y in:inbox -in:spam -in:trash"
+uv run gmail_cleanup.py --query "older_than:2y in:inbox -in:spam -in:trash"
 
 # Email più vecchie del 1° gennaio 2023
-python gmail_cleanup.py --query "before:2023/01/01 -in:spam -in:trash"
+uv run gmail_cleanup.py --query "before:2023/01/01 -in:spam -in:trash"
 
 # Escludere le email di un mittente
-python gmail_cleanup.py --query "older_than:2y -from:capo@azienda.com -in:spam -in:trash"
+uv run gmail_cleanup.py --query "older_than:2y -from:capo@azienda.com -in:spam -in:trash"
 ```
 
 ### Proteggere email con certe etichette
 
 ```bash
-python gmail_cleanup.py --protect-label Fatture --protect-label Keep
+uv run gmail_cleanup.py --protect-label Fatture --protect-label Keep
 ```
 
 Le email che hanno una di queste etichette **non verranno cancellate**.
@@ -122,10 +122,10 @@ Puoi schedulare lo script per eseguirlo periodicamente:
 
 ```bash
 # Simulazione: quanti messaggi più vecchi di 2 anni verrebbero eliminati
-python gmail_cleanup.py --dry-run
+uv run gmail_cleanup.py --dry-run
 
 # Elimina davvero spostando nel Cestino
-python gmail_cleanup.py
+uv run gmail_cleanup.py
 ```
 
 ---
